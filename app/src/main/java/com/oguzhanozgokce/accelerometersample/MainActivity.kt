@@ -63,31 +63,34 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
         event?.let {
-            if (it.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-                getAccelerometer(event)
+            if (it.sensor.type == Sensor.TYPE_GYROSCOPE) {
+                getGyroscopeData(event)
             }
         }
     }
 
-    private fun getAccelerometer(event: SensorEvent) {
-        xVal = event.values[0]
-        yVal = event.values[1]
-        zVal = event.values[2]
+    private fun getGyroscopeData(event: SensorEvent) {
+        xVal = event.values[0]  // X ekseni üzerindeki rotasyon hızı
+        yVal = event.values[1]  // Y ekseni üzerindeki rotasyon hızı
+        zVal = event.values[2]  // Z ekseni üzerindeki rotasyon hızı
 
-        val accelerationSquareRoot =
-            (xVal * xVal + yVal * yVal + zVal * zVal) / (SensorManager.GRAVITY_EARTH * SensorManager.GRAVITY_EARTH)
+        // Eğer cihaz belirli bir hızda hareket ediyorsa, renk değişikliği ve hareket algılama
+        val rotationThreshold = Math.sqrt(
+            (xVal * xVal + yVal * yVal + zVal * zVal).toDouble()
+        )
 
-        if (accelerationSquareRoot >= 3) {
+        if (rotationThreshold >= 3) {
             Toast.makeText(this, "Cihaz hareket etti!", Toast.LENGTH_SHORT).show()
             color = !color
         }
     }
 
+
     override fun onResume() {
         super.onResume()
         sensorManager!!.registerListener(
             this,
-            sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+            sensorManager!!.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
             SensorManager.SENSOR_DELAY_NORMAL
         )
     }
